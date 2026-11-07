@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#030508">
+    <title>NEXUS PRO v6.0 — PHANTOM CYBER-OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+            --canvas: #030508;
+            --bg-void: #030508;
+        }
+        * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: transparent; }
+        html, body { background-color: var(--canvas); overscroll-behavior-y: none; }
+        body {
+            font-family: var(--font-sans);
+            color: #E2E8F0;
+            background-color: var(--canvas);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .font-mono, code, pre, .mono, input[type="text"], textarea, select { font-family: var(--font-mono); }
+
+        /* ================== BACKGROUND ARCHITECTURE ================== */
+        .bg-void {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse 90% 60% at 50% -10%, rgba(99,102,241,0.10), transparent 60%),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(6,182,212,0.06), transparent 60%),
+                radial-gradient(ellipse 60% 50% at 0% 80%, rgba(139,92,246,0.05), transparent 60%),
+                var(--bg-void);
+        }
+
+        /* 3D Perspective Cyber Grid Floor */
+        .cyber-floor {
+            position: fixed;
+            left: -50%; right: -50%;
+            bottom: -30%;
+            height: 70%;
+            z-index: 0;
+            pointer-events: none;
+            perspective: 400px;
+            overflow: hidden;
+            mask-image: linear-gradient(to top, rgba(0,0,0,0.7), transparent 85%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.7), transparent 85%);
+        }
+        .cyber-floor-inner {
+            position: absolute;
+            left: 0; right: 0; top: 0;
+            height: 200%;
+            background-image:
+                linear-gradient(rgba(99,102,241,0.35) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.35) 1px, transparent 1px);
+            background-size: 44px 44px;
+            transform: rotateX(68deg) translateZ(0);
+            transform-origin: center top;
+            animation: gridScroll 8s linear infinite;
+        }
+        @keyframes gridScroll {
+            0%   { background-position: 0 0; }
+            100% { background-position: 0 44px; }
+        }
+
+        /* Rotating Conic Aura Ring */
+        .aura-ring {
+            position: fixed;
+            width: 640px; height: 640px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, rgba(99,102,241,0.0), rgba(99,102,241,0.22), rgba(139,92,246,0.18), rgba(6,182,212,0.18), rgba(99,102,241,0.0));
+            filter: blur(70px);
+            opacity: 0.55;
+            animation: auraSpin 24s linear infinite;
+        }
+        @keyframes auraSpin {
+            0%   { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Floating Particle Nodes */
+        .particle-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px; border-radius: 50%;
+            background: rgba(165,180,252,0.9);
+            box-shadow: 0 0 10px rgba(165,180,252,0.9), 0 0 20px rgba(99,102,241,0.4);
+            animation: particleFloat linear infinite;
+        }
+        @keyframes particleFloat {
+            0%   { transform: translateY(0) translateX(0); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { transform: translateY(-120vh) translateX(20px); opacity: 0; }
+        }
+
+        .content-wrap { position: relative; z-index: 1; }
+
+        /* ================== GLASS ================== */
+        .glass {
+            background: rgba(10, 14, 24, 0.68);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+        }
+        .glass-lite {
+            background: rgba(10, 14, 24, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ================== GLOWS ================== */
+        .glow-emerald { box-shadow: 0 0 24px -4px rgba(16, 185, 129, 0.20), inset 0 1px 0 0 rgba(16, 185, 129, 0.10); }
+        .glow-amber   { box-shadow: 0 0 24px -4px rgba(245, 158, 11, 0.18), inset 0 1px 0 0 rgba(245, 158, 11, 0.10); }
+        .glow-cyan    { box-shadow: 0 0 24px -4px rgba(6, 182, 212, 0.18), inset 0 1px 0 0 rgba(6, 182, 212, 0.10); }
+        .glow-rose    { box-shadow: 0 0 24px -4px rgba(244, 63, 94, 0.18), inset 0 1px 0 0 rgba(244, 63, 94, 0.10); }
+        .glow-indigo  { box-shadow: 0 0 25px -4px rgba(99, 102, 241, 0.30); }
+
+        /* ================== BRAND SHIMMER ================== */
+        .brand-text {
+            background: linear-gradient(90deg, #ffffff 0%, #a5b4fc 25%, #818cf8 45%, #ffffff 60%, #a5b4fc 80%, #ffffff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: brandShimmer 6s linear infinite;
+        }
+        @keyframes brandShimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+        .btn-start {
+            background: linear-gradient(110deg, #4f46e5, #7c3aed, #4f46e5, #6d28d9);
+            background-size: 300% auto;
+            animation: btnFlow 5s linear infinite;
+            transition: filter .2s ease, transform .2s ease;
+            box-shadow: 0 0 22px -4px rgba(99, 102, 241, 0.50), inset 0 1px 0 0 rgba(255,255,255,0.15);
+        }
+        .btn-start:hover:not(:disabled) {
+            filter: brightness(1.12);
+            transform: translateY(-1px);
+            box-shadow: 0 0 34px -4px rgba(99, 102, 241, 0.70), inset 0 1px 0 0 rgba(255,255,255,0.20);
+        }
+        @keyframes btnFlow { 0% { background-position: 0% center; } 100% { background-position: 300% center; } }
+
+        /* ================== LOGIN PORTAL ================== */
+        #loginGate {
+            position: fixed; inset: 0; z-index: 50;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+            transition: opacity .5s ease, transform .5s ease;
+            overflow-y: auto;
+        }
+        #loginGate.hidden-gate { opacity: 0; transform: scale(1.04); pointer-events: none; }
+
+        /* Outer gradient border wrapper */
+        .vault-wrapper {
+            max-width: 400px; width: 100%;
+            padding: 1px;
+            border-radius: 1.5rem;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.20), rgba(99,102,241,0.20), transparent);
+            box-shadow: 0 25px 70px -15px rgba(99,102,241,0.35);
+        }
+        .vault-card {
+            background: rgba(6, 9, 16, 0.94);
+            backdrop-filter: blur(30px) saturate(160%);
+            -webkit-backdrop-filter: blur(30px) saturate(160%);
+            border-radius: calc(1.5rem - 1px);
+            padding: 1.25rem;
+        }
+
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+        .animate-spin-slow { animation: spinSlow 14s linear infinite; }
+
+        @keyframes radarPulse {
+            0%   { transform: scale(0.85); opacity: 0.85; }
+            80%, 100% { transform: scale(2.2); opacity: 0; }
+        }
+        .radar-pulse { animation: radarPulse 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+        @keyframes hologramGlow {
+            0%, 100% { box-shadow: 0 0 30px -6px rgba(99,102,241,0.55), inset 0 0 20px rgba(99,102,241,0.15); }
+            50% { box-shadow: 0 0 50px -6px rgba(139,92,246,0.75), inset 0 0 30px rgba(139,92,246,0.25); }
+        }
+        .hologram-core { animation: hologramGlow 3.4s ease-in-out infinite; }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%      { opacity: 0.35; transform: scale(0.85); }
+        }
+        .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+
+        @keyframes radarPing {
+            0% { transform: scale(1); opacity: 0.75; }
+            80%, 100% { transform: scale(2.6); opacity: 0; }
+        }
+        .radar-ping { animation: radarPing 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner {
+            border: 2px solid rgba(255,255,255,0.18);
+            border-top-color: #fff;
+            border-radius: 50%;
+            width: 13px; height: 13px;
+            animation: spin .7s linear infinite;
+            display: inline-block;
+        }
+
+        /* ================== ANIMATIONS ================== */
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .toast-item { animation: toastIn .3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        @keyframes lineIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .terminal-line { animation: lineIn .22s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        @keyframes vaultArrival {
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.20); }
+            100% { box-shadow: 0 0 0 14px rgba(255,255,255,0); }
+        }
+        .vault-arrival-pulse { animation: vaultArrival .9s ease-out; }
+
+        @keyframes tabPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
+            50%      { box-shadow: 0 0 12px -2px rgba(255,255,255,0.15); }
+        }
+        .tab-active-pulse { animation: tabPulse 2s ease-in-out infinite; }
+
+        /* ================== SCROLLBAR ================== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.20); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.40); }
+
+        /* ================== TOOLTIP ================== */
+        [data-tooltip] { position: relative; }
+        [data-tooltip]:hover::after {
+            content: attr(data-tooltip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: #cbd5e1; padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 500;
+            white-space: nowrap; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            z-index: 80; pointer-events: none; letter-spacing: 0.02em;
+        }
+
+        button:disabled { opacity: 0.42; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
+        textarea:focus, select:focus, input:focus { outline: none; }
+
+        /* ================== TICKER ================== */
+        .ticker-track-wrap {
+            overflow: hidden; position: relative; flex: 1;
+            mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+            -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 6%, #000 94%, transparent 100%);
+        }
+        .ticker-track {
+            display: inline-flex; gap: 2rem; white-space: nowrap;
+            animation: marqueeScroll 32s linear infinite;
+            will-change: transform;
+        }
+        .ticker-track-wrap:hover .ticker-track { animation-play-state: paused; }
+        @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* ================== GATEWAY SELECT ================== */
+        .gateway-select {
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px;
+        }
+        .gateway-select option { background: #0b1220; color: #e2e8f0; }
+
+        /* ================== MASK TOGGLE ================== */
+        .mask-toggle.on { background: rgba(99,102,241,0.18); border-color: rgba(99,102,241,0.45); color: #a5b4fc; }
+        .mask-toggle.off { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08); color: #64748b; }
+
+        /* ================== ADMIN MODAL ================== */
+        #adminModal {
+            position: fixed; inset: 0; z-index: 70; display: none;
+            align-items: center; justify-content: center; padding: 1rem;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+        }
+        #adminModal.open { display: flex; }
+
+        /* ================== RESULT TAB THEMES ================== */
+        .tab-btn { transition: all .2s ease; }
+        .tab-btn[data-tab="approved"].active-tab { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.4); color: #6ee7b7; box-shadow: 0 0 12px -3px rgba(16,185,129,0.4); }
+        .tab-btn[data-tab="insu"].active-tab     { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.4); color: #fcd34d; box-shadow: 0 0 12px -3px rgba(245,158,11,0.4); }
+        .tab-btn[data-tab="3ds"].active-tab      { background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.4); color: #67e8f9; box-shadow: 0 0 12px -3px rgba(6,182,212,0.4); }
+        .tab-btn[data-tab="declined"].active-tab { background: rgba(244,63,94,0.15); border-color: rgba(244,63,94,0.4); color: #fda4af; box-shadow: 0 0 12px -3px rgba(244,63,94,0.4); }
+
+        .result-row {
+            transition: background .15s ease, border-color .15s ease;
+        }
+        .result-row:hover { background: rgba(255,255,255,0.05) !important; }
+
+        /* Mobile-optimized: keep tabs readable */
+        @media (max-width: 420px) {
+            .tab-btn span.tab-count { display: none; }
+        }
+
+        /* ================== LOGIN PARTICLE ================== */
+        @keyframes loginParticleFloat {
+            0%   { transform: translateY(0) translateX(0); opacity: 0; }
+            15%  { opacity: 0.8; }
+            85%  { opacity: 0.8; }
+            100% { transform: translateY(-100vh) translateX(15px); opacity: 0; }
+        }
+        .login-particle {
+            position: absolute; width: 2px; height: 2px; border-radius: 50%;
+            background: rgba(165,180,252,0.95);
+            box-shadow: 0 0 8px rgba(165,180,252,0.9);
+            animation: loginParticleFloat linear infinite;
+        }
+
+        /* ================== KEY STATUS BADGE ================== */
+        .key-status-badge {
+            transition: all .2s ease;
+        }
+        .key-status-badge.detected {
+            background: rgba(16,185,129,0.15);
+            color: #6ee7b7;
+            border-color: rgba(16,185,129,0.4);
+        }
+
+        /* Admin unlock animation */
+        @keyframes adminUnlock {
+            0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0.6); }
+            100% { box-shadow: 0 0 0 20px rgba(245,158,11,0); }
+        }
+        .admin-unlock-pulse { animation: adminUnlock .9s ease-out; }
+
+        /* Ensure input deck interactive paste */
+        .input-deck { position: relative; }
+        .paste-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-indigo-500/30 selection:text-white">
+
+    <!-- ================== BACKGROUND ================== -->
+    <div class="bg-void" aria-hidden="true"></div>
+    <div class="cyber-floor" aria-hidden="true"><div class="cyber-floor-inner"></div></div>
+    <div class="aura-ring" aria-hidden="true"></div>
+    <div class="particle-field" id="particleField" aria-hidden="true"></div>
+
+    <!-- ================== TOAST CONTAINER ================== -->
+    <div id="toastContainer" class="fixed top-3 right-3 z-[100] flex flex-col gap-2 w-[340px] max-w-[calc(100vw-1.5rem)] pointer-events-none"></div>
+
+    <!-- =========================================================
+         LOGIN GATE — PHANTOM/Raycast Quantum Vault
+         ========================================================= -->
+    <div id="loginGate">
+        <div class="login-particle-field absolute inset-0 overflow-hidden pointer-events-none" id="loginParticleField"></div>
+
+        <div class="vault-wrapper">
+            <div class="vault-card relative">
+                <!-- Top Security Telemetry Strip -->
+                <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+                    <div class="flex items-center gap-1.5 text-[8px] font-bold mono tracking-wider text-emerald-300/90">
+                        <i class="fa-solid fa-lock text-[8px]"></i>
+                        <span>TLS 1.3 ENCRYPTED</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-[8px] font-bold mono tracking-wider text-indigo-300/90">
+                        <span class="relative flex h-1.5 w-1.5">
+                            <span class="radar-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                        </span>
+                        <span>● NODE: SG-01</span>
+                    </div>
+                </div>
+
+                <!-- Holographic Core Emblem -->
+                <div class="flex flex-col items-center pt-5 pb-4">
+                    <div class="relative">
+                        <!-- Outer rotating dashed ring -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-[110px] h-[110px] rounded-full border border-dashed border-indigo-500/30 animate-spin-slow"></div>
+                        </div>
+                        <!-- Radar ring pulse -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-[86px] h-[86px] rounded-full border border-indigo-500/30 radar-pulse"></div>
+                        </div>
+                        <!-- Core emblem -->
+                        <div class="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-700 flex items-center justify-center hologram-core">
+                            <i class="fa-solid fa-shield-halved text-white text-3xl"></i>
+                            <span class="absolute -bottom-1 -right-1 flex h-4 w-4">
+                                <span class="radar-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-[#060912]"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Brand Title -->
+                    <div class="mt-5 flex items-center gap-1.5">
+                        <h1 class="text-base font-extrabold tracking-tight leading-none">
+                            <span class="brand-text">NEXUS OS</span>
+                        </h1>
+                        <span class="text-[8px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded mono tracking-wider">v6.0</span>
+                    </div>
+                    <p class="text-[8px] text-slate-500 font-bold mono tracking-[0.2em] mt-1">PHANTOM CYBER-OS</p>
+                </div>
+
+                <!-- Access Key Input Deck -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[9px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
+                            <i class="fa-solid fa-key text-indigo-400 text-[9px]"></i> CRYPTOGRAPHIC ACCESS KEY
+                        </label>
+                        <span id="keyStatusBadge" class="key-status-badge text-[7px] font-bold mono tracking-wider bg-slate-800/80 text-slate-500 border border-white/10 px-1.5 py-0.5 rounded">AWAITING KEY</span>
+                    </div>
+                    <div class="input-deck">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                        <input id="gateAccessKeyInput" type="text" placeholder="CHK-XXXXX-XXXXX" autocomplete="off" spellcheck="false"
+                            oninput="onKeyInputChange()"
+                            class="w-full bg-black/80 border border-white/10 rounded-2xl h-13 pl-10 pr-20 text-sm mono tracking-widest text-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-500/30 transition placeholder:text-slate-600 placeholder:tracking-normal placeholder:text-xs py-3.5">
+                        <button onclick="pasteKey()" class="paste-btn bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 hover:border-indigo-400/50 text-indigo-300 text-[9px] font-bold mono tracking-wider px-2.5 py-1.5 rounded-lg transition flex items-center gap-1">
+                            <i class="fa-solid fa-paste text-[8px]"></i> PASTE
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Primary Action -->
+                <button onclick="loginFromGate()" id="gateConnectBtn"
+                    class="mt-4 w-full h-12 rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600 font-bold tracking-wider text-xs text-white shadow-[0_0_30px_-5px_rgba(99,102,241,0.6)] hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.85)] transition flex items-center justify-center gap-2 group">
+                    <span id="gateBtnLabel">INITIALIZE SESSION</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] transition-transform group-hover:translate-x-1"></i>
+                </button>
+
+                <!-- 2-Step Onboarding Card -->
+                <div class="mt-4 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-3.5">
+                    <div class="space-y-2.5">
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-5 h-5 rounded-md bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[9px] font-bold mono flex items-center justify-center flex-shrink-0">01</span>
+                            <p class="text-[10px] text-slate-400 leading-snug pt-0.5">Open our official Telegram Bot & send <code class="text-indigo-300 bg-indigo-500/10 px-1 py-0.5 rounded text-[9px]">/start</code></p>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-5 h-5 rounded-md bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[9px] font-bold mono flex items-center justify-center flex-shrink-0">02</span>
+                            <p class="text-[10px] text-slate-400 leading-snug pt-0.5">Copy your auto-generated <code class="text-indigo-300 bg-indigo-500/10 px-1 py-0.5 rounded text-[9px]">CHK-XXXXX</code> key & paste above</p>
+                        </div>
+                    </div>
+
+                    <a href="https://t.me/YourCheckerBot" target="_blank" rel="noopener"
+                        class="mt-3 w-full bg-[#229ED9]/15 hover:bg-[#229ED9]/25 border border-[#229ED9]/30 text-[#38bdf8] rounded-xl py-2.5 text-xs font-bold flex items-center justify-center gap-2 transition">
+                        <i class="fa-brands fa-telegram text-sm"></i>
+                        <span>Open Telegram Bot</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[8px] opacity-60"></i>
+                    </a>
+                </div>
+
+                <p class="text-[8px] text-slate-600 text-center font-medium mt-3">
+                    <i class="fa-solid fa-shield-halved mr-1 text-slate-700"></i> End-to-end encrypted session • Auto-login persists
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         MAIN WORKSPACE
+         ========================================================= -->
+    <div id="mainWorkspace" class="content-wrap max-w-[1500px] mx-auto px-3 md:px-6 py-2.5 space-y-2.5 opacity-0" style="display:none;">
+
+        <!-- ============ ULTRA-SLEEK SINGLE-ROW APP BAR ============ -->
+        <header class="glass rounded-2xl h-14 px-3 md:px-4 flex items-center justify-between gap-2">
+            <!-- Left: Brand -->
+            <div class="flex items-center gap-2.5 flex-shrink-0">
+                <div class="relative">
+                    <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-700 flex items-center justify-center glow-indigo">
+                        <i class="fa-solid fa-shield-halved text-white text-xs"></i>
+                    </div>
+                    <span class="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
+                        <span class="radar-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border-2 border-[#030508]"></span>
+                    </span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="text-sm font-extrabold tracking-tight leading-none">
+                        <span class="brand-text">NEXUS</span>
+                    </h1>
+                    <span class="text-[7px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded mono tracking-wider">PRO</span>
+                </div>
+            </div>
+
+            <!-- Right: Unified Control Pill -->
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+                <!-- Credits Pill -->
+                <div class="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-2.5 py-1">
+                    <i class="fa-solid fa-bolt text-emerald-400 text-[9px]"></i>
+                    <span class="text-[11px] font-bold text-emerald-300 mono leading-none" id="creditDisplay">0</span>
+                </div>
+
+                <!-- User Badge -->
+                <div class="hidden sm:flex items-center gap-1.5 bg-white/[0.04] border border-white/10 rounded-full px-2.5 py-1">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="radar-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-semibold text-emerald-300 mono truncate max-w-[80px]" id="userNameDisplay">@user</span>
+                </div>
+
+                <!-- Action Icons -->
+                <button onclick="toggleRedeemDrawer()" data-tooltip="Redeem voucher"
+                    class="w-7 h-7 rounded-full bg-white/[0.04] hover:bg-white/[0.10] border border-white/10 text-slate-300 hover:text-emerald-300 transition flex items-center justify-center">
+                    <i class="fa-solid fa-gift text-[10px]"></i>
+                </button>
+
+                <button id="adminPanelBtn" onclick="openAdminPanel()" style="display:none" data-tooltip="Admin Panel"
+                    class="w-7 h-7 rounded-full bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 transition flex items-center justify-center">
+                    <i class="fa-solid fa-crown text-[10px]"></i>
+                </button>
+
+                <button onclick="logout()" data-tooltip="Logout"
+                    class="w-7 h-7 rounded-full bg-white/[0.04] hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/30 text-slate-400 hover:text-rose-400 transition flex items-center justify-center">
+                    <i class="fa-solid fa-right-from-bracket text-[10px]"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ============ EDGE-TO-EDGE BROADCAST TICKER ============ -->
+        <div class="glass rounded-xl flex items-center gap-2 px-2 py-1 overflow-hidden h-8">
+            <span class="inline-flex items-center gap-1 text-[8px] font-bold bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full mono tracking-wider whitespace-nowrap flex-shrink-0">
+                <span class="relative flex h-1 w-1">
+                    <span class="radar-ping absolute inline-flex h-full w-full rounded-full bg-amber-400"></span>
+                    <span class="relative inline-flex rounded-full h-1 w-1 bg-amber-500"></span>
+                </span>
+                <i class="fa-solid fa-bolt text-[7px]"></i> LIVE
+            </span>
+            <button id="tickerEditBtn" onclick="editTickerText()" data-tooltip="Edit announcement" style="display:none" class="text-slate-500 hover:text-indigo-400 transition flex-shrink-0">
+                <i class="fa-solid fa-gear text-[9px]"></i>
+            </button>
+            <div class="ticker-track-wrap flex-1 min-w-0">
+                <div class="ticker-track" id="tickerTrack"></div>
+            </div>
+        </div>
+
+        <!-- ============ REDEEM DRAWER ============ -->
+        <div id="redeemDrawer" class="hidden glass rounded-xl px-3 py-2">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-ticket text-emerald-400 text-[10px]"></i>
+                    <span class="text-[10px] text-slate-400">Redeem voucher</span>
+                </div>
+                <div class="flex items-center gap-1.5 flex-1 sm:flex-none justify-end min-w-[180px]">
+                    <input id="redeemInput" type="text" placeholder="VIP-XXXX-XXXX" autocomplete="off"
+                        class="bg-black/40 border border-white/10 rounded-lg px-2 py-1.5 text-[10px] mono text-slate-200 w-full sm:w-[160px] focus:border-emerald-500/60 transition placeholder:text-slate-600">
+                    <button onclick="redeemCode()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 whitespace-nowrap">
+                        <i class="fa-solid fa-check text-[8px]"></i> Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ CYBER HUD TELEMETRY MATRIX ============ -->
+        <div class="glass rounded-2xl p-2.5 space-y-2">
+            <!-- Top Row -->
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
+                    <span id="engineStatusBadge" class="inline-flex items-center gap-1 text-[9px] font-bold bg-slate-800/80 text-slate-400 border border-white/10 px-2 py-1 rounded-full mono tracking-wider">
+                        <span class="h-1.5 w-1.5 rounded-full bg-slate-500" id="engineStatusDot"></span>
+                        <span id="engineStatusText">SYSTEM READY</span>
+                    </span>
+                    <span id="gatewayTag" class="inline-flex items-center gap-1 text-[8px] font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded-full mono tracking-wider whitespace-nowrap">
+                        <i class="fa-solid fa-bolt text-[7px]"></i> STRIPE $1
+                    </span>
+                </div>
+                <button id="maskToggle" onclick="toggleMasking()" data-tooltip="Hide/show sensitive data"
+                    class="mask-toggle on text-[9px] font-bold border rounded-full px-2.5 py-1 mono tracking-wider flex items-center gap-1 transition flex-shrink-0">
+                    <i class="fa-solid fa-eye text-[9px]" id="maskIcon"></i>
+                    <span id="maskLabel">MASK ON</span>
+                </button>
+            </div>
+
+            <!-- Progress Laser -->
+            <div class="relative w-full h-1 rounded-full bg-black/60 overflow-hidden border border-white/[0.04]">
+                <div class="absolute inset-0 flex">
+                    <div id="segApproved" class="h-full bg-emerald-500 transition-all duration-500 ease-out" style="width:0%"></div>
+                    <div id="segInsu" class="h-full bg-amber-500 transition-all duration-500 ease-out" style="width:0%"></div>
+                    <div id="seg3ds" class="h-full bg-cyan-500 transition-all duration-500 ease-out" style="width:0%"></div>
+                    <div id="segDeclined" class="h-full bg-rose-500 transition-all duration-500 ease-out" style="width:0%"></div>
+                </div>
+            </div>
+
+            <!-- 5-Column Mini Bento -->
+            <div class="grid grid-cols-5 gap-1.5">
+                <div class="bg-black/40 border border-white/[0.06] rounded-lg py-1.5 text-center">
+                    <p class="text-[7px] font-bold text-slate-500 mono tracking-wider leading-none mb-1">QUEUE</p>
+                    <p class="text-sm font-extrabold text-slate-200 mono leading-none" id="statQueued">0</p>
+                </div>
+                <div class="bg-black/40 border border-emerald-500/25 rounded-lg py-1.5 text-center" style="box-shadow: inset 0 0 12px -6px rgba(16,185,129,0.4);">
+                    <p class="text-[7px] font-bold text-emerald-500/90 mono tracking-wider leading-none mb-1">APPROVED</p>
+                    <p class="text-sm font-extrabold text-emerald-400 mono leading-none" id="statApproved">0</p>
+                </div>
+                <div class="bg-black/40 border border-amber-500/25 rounded-lg py-1.5 text-center" style="box-shadow: inset 0 0 12px -6px rgba(245,158,11,0.4);">
+                    <p class="text-[7px] font-bold text-amber-500/90 mono tracking-wider leading-none mb-1">INSU</p>
+                    <p class="text-sm font-extrabold text-amber-400 mono leading-none" id="statInsu">0</p>
+                </div>
+                <div class="bg-black/40 border border-cyan-500/25 rounded-lg py-1.5 text-center" style="box-shadow: inset 0 0 12px -6px rgba(6,182,212,0.4);">
+                    <p class="text-[7px] font-bold text-cyan-500/90 mono tracking-wider leading-none mb-1">3DS</p>
+                    <p class="text-sm font-extrabold text-cyan-400 mono leading-none" id="stat3DS">0</p>
+                </div>
+                <div class="bg-black/40 border border-rose-500/25 rounded-lg py-1.5 text-center" style="box-shadow: inset 0 0 12px -6px rgba(244,63,94,0.4);">
+                    <p class="text-[7px] font-bold text-rose-500/90 mono tracking-wider leading-none mb-1">DECLINED</p>
+                    <p class="text-sm font-extrabold text-rose-400 mono leading-none" id="statDeclined">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ MAIN WORKSPACE GRID ============ -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-2.5">
+
+            <!-- ================= LEFT: INPUT (4 cols) ================= -->
+            <div class="lg:col-span-4 glass rounded-2xl p-3 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-keyboard text-slate-400 text-[10px]"></i>
+                        <label class="text-[10px] font-bold text-slate-300 tracking-wide uppercase">Input Deck</label>
+                    </div>
+                    <span id="lineCountBadge" class="text-[8px] font-bold bg-black/40 border border-white/10 px-2 py-0.5 rounded-md text-slate-400 mono tracking-wider">0 LINES</span>
+                </div>
+
+                <!-- Gateway Selector -->
+                <div class="space-y-1">
+                    <label class="text-[8px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1">
+                        <i class="fa-solid fa-network-wired text-indigo-400 text-[8px]"></i> Payment Gateway
+                    </label>
+                    <select id="gatewaySelect" onchange="onGatewayChange()" class="gateway-select w-full bg-black/50 border border-white/10 rounded-lg px-2.5 py-2 text-[10px] mono text-slate-200 focus:border-indigo-500/60 transition cursor-pointer">
+                        <option value="stripe_1" data-cost="1" data-tag="STRIPE $1">⚡ Stripe $1.00 Charge — [CVV / CCN] (1 CR)</option>
+                        <option value="square_1" data-cost="1" data-tag="SQUARE $1">🟦 Square $1.00 Charge — [Fast Charge] (1 CR)</option>
+                        <option value="stripe_auth" data-cost="1" data-tag="STRIPE AUTH">🟣 Stripe $0.00 Auth — [SetupIntent] (1 CR)</option>
+                        <option value="braintree_1" data-cost="1" data-tag="BRAINTREE $1">🟢 Braintree $1.00 Charge — [AVS / CVV] (1 CR)</option>
+                        <option value="shopify_1" data-cost="2" data-tag="SHOPIFY $1.5">🛍️ Shopify $1.50 Charge — [Auto Checkout] (2 CR)</option>
+                        <option value="vbv_lookup" data-cost="1" data-tag="CYBERSOURCE">🔐 Cybersource 3DS v2 — [OTP Lookup] (1 CR)</option>
+                    </select>
+                </div>
+
+                <!-- Utilities -->
+                <div class="flex flex-wrap items-center gap-1">
+                    <button onclick="removeDuplicates()" data-tooltip="Remove duplicate lines"
+                        class="text-[9px] font-bold bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-slate-400 hover:text-white px-2 py-1 rounded-md transition flex items-center gap-1">
+                        <i class="fa-solid fa-clone text-[8px]"></i> Dedup
+                    </button>
+                    <button onclick="cleanEmptyLines()" data-tooltip="Strip empty lines"
+                        class="text-[9px] font-bold bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-slate-400 hover:text-white px-2 py-1 rounded-md transition flex items-center gap-1">
+                        <i class="fa-solid fa-broom text-[8px]"></i> Clean
+                    </button>
+                    <label data-tooltip="Import .txt"
+                        class="text-[9px] font-bold bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-slate-400 hover:text-white px-2 py-1 rounded-md transition flex items-center gap-1 cursor-pointer">
+                        <i class="fa-solid fa-file-import text-[8px]"></i> Import
+                        <input type="file" accept=".txt" class="hidden" onchange="importTxtFile(event)">
+                    </label>
+                    <button onclick="clearInput()" data-tooltip="Clear"
+                        class="text-[9px] font-bold bg-white/[0.03] hover:bg-rose-500/20 border border-white/[0.06] hover:border-rose-500/30 text-slate-400 hover:text-rose-400 px-2 py-1 rounded-md transition flex items-center gap-1 ml-auto">
+                        <i class="fa-solid fa-trash text-[8px]"></i> Clear
+                    </button>
+                </div>
+
+                <textarea id="bulkInput" rows="10" oninput="onInputChange()" spellcheck="false"
+                    placeholder="Paste your data here — one per line..."
+                    class="w-full bg-black/50 border border-white/[0.08] rounded-lg p-2.5 text-[11px] text-slate-200 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition resize-none leading-relaxed placeholder:text-slate-600 scrollbar-thin" style="min-height: 170px; max-height: 340px;"></textarea>
+
+                <div class="flex gap-1.5">
+                    <button id="startBtn" onclick="startEngine()"
+                        class="btn-start flex-1 h-11 text-white font-bold text-[11px] tracking-wide rounded-lg flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-play text-[9px]"></i> START ENGINE
+                    </button>
+                    <button id="stopBtn" onclick="stopEngine()" disabled
+                        class="flex-1 h-11 bg-rose-600/80 hover:bg-rose-600 text-white font-bold text-[11px] tracking-wide rounded-lg transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-stop text-[9px]"></i> STOP
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= RIGHT: TABBED VAULT CONSOLE (8 cols) ================= -->
+            <div class="lg:col-span-8 glass rounded-2xl p-3 flex flex-col">
+
+                <!-- Tab Bar -->
+                <div class="grid grid-cols-4 gap-1 p-1 bg-black/60 rounded-xl border border-white/10 mb-2">
+                    <button data-tab="approved" onclick="switchTab('approved')" class="tab-btn active-tab text-[10px] font-bold py-1.5 rounded-lg border border-transparent text-slate-400 flex items-center justify-center gap-1">
+                        <span class="hidden sm:inline">✅</span>
+                        <span>APPROVED</span>
+                        <span class="tab-count text-[8px] mono opacity-70">(<span id="tabCountApproved">0</span>)</span>
+                    </button>
+                    <button data-tab="insu" onclick="switchTab('insu')" class="tab-btn text-[10px] font-bold py-1.5 rounded-lg border border-transparent text-slate-400 flex items-center justify-center gap-1">
+                        <span class="hidden sm:inline">⚠️</span>
+                        <span>INSU</span>
+                        <span class="tab-count text-[8px] mono opacity-70">(<span id="tabCountInsu">0</span>)</span>
+                    </button>
+                    <button data-tab="3ds" onclick="switchTab('3ds')" class="tab-btn text-[10px] font-bold py-1.5 rounded-lg border border-transparent text-slate-400 flex items-center justify-center gap-1">
+                        <span class="hidden sm:inline">🔐</span>
+                        <span>3DS</span>
+                        <span class="tab-count text-[8px] mono opacity-70">(<span id="tabCount3ds">0</span>)</span>
+                    </button>
+                    <button data-tab="declined" onclick="switchTab('declined')" class="tab-btn text-[10px] font-bold py-1.5 rounded-lg border border-transparent text-slate-400 flex items-center justify-center gap-1">
+                        <span class="hidden sm:inline">❌</span>
+                        <span>DECL</span>
+                        <span class="tab-count text-[8px] mono opacity-70">(<span id="tabCountDeclined">0</span>)</span>
+                    </button>
+                </div>
+
+                <!-- Console Action Bar -->
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 pulse-dot" id="activeTabDot"></span>
+                        <h3 class="text-[10px] font-bold text-emerald-400 tracking-wider uppercase truncate" id="activeTabTitle">APPROVED</h3>
+                        <span class="text-[8px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 px-1.5 py-0.5 rounded mono" id="activeTabCount">0</span>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="copyActiveVault()" data-tooltip="Copy raw"
+                            class="text-[9px] font-bold bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-slate-400 hover:text-white px-2 py-1 rounded-md transition flex items-center gap-1">
+                            <i class="fa-regular fa-copy text-[8px]"></i> <span class="hidden sm:inline">Copy</span>
+                        </button>
+                        <button onclick="exportActiveVault()" data-tooltip="Export .txt"
+                            class="text-[9px] font-bold bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] text-slate-400 hover:text-white px-2 py-1 rounded-md transition flex items-center gap-1">
+                            <i class="fa-solid fa-download text-[8px]"></i> <span class="hidden sm:inline">Export</span>
+                        </button>
+                        <button onclick="clearActiveVault()" data-tooltip="Clear active tab"
+                            class="text-[9px] font-bold bg-white/[0.03] hover:bg-rose-500/20 border border-white/[0.06] hover:border-rose-500/30 text-slate-400 hover:text-rose-400 px-2 py-1 rounded-md transition flex items-center gap-1">
+                            <i class="fa-solid fa-trash text-[8px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terminal Viewport -->
+                <div class="flex-1 bg-black/55 rounded-xl border border-white/[0.06] p-2 overflow-y-auto font-mono text-[10px] scrollbar-thin" style="min-height: 280px; max-height: 420px;">
+                    <div id="terminalApproved" class="terminal-pane space-y-1">
+                        <div class="empty-state flex flex-col items-center justify-center py-12 text-slate-700 gap-2">
+                            <i class="fa-regular fa-folder-open text-2xl opacity-60"></i>
+                            <span class="text-[9px] font-medium tracking-wide">No approved hits yet</span>
+                        </div>
+                    </div>
+                    <div id="terminalInsu" class="terminal-pane space-y-1 hidden">
+                        <div class="empty-state flex flex-col items-center justify-center py-12 text-slate-700 gap-2">
+                            <i class="fa-solid fa-coins text-2xl opacity-60"></i>
+                            <span class="text-[9px] font-medium tracking-wide">No insu results yet</span>
+                        </div>
+                    </div>
+                    <div id="terminal3ds" class="terminal-pane space-y-1 hidden">
+                        <div class="empty-state flex flex-col items-center justify-center py-12 text-slate-700 gap-2">
+                            <i class="fa-solid fa-lock text-2xl opacity-60"></i>
+                            <span class="text-[9px] font-medium tracking-wide">No 3DS challenges yet</span>
+                        </div>
+                    </div>
+                    <div id="terminalDeclined" class="terminal-pane space-y-1 hidden">
+                        <div class="empty-state flex flex-col items-center justify-center py-12 text-slate-700 gap-2">
+                            <i class="fa-regular fa-circle-xmark text-2xl opacity-60"></i>
+                            <span class="text-[9px] font-medium tracking-wide">No declined results yet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center pt-1 pb-3">
+            <p class="text-[8px] text-slate-700 font-medium tracking-wider uppercase">NEXUS PRO © 2025 — PHANTOM CYBER-OS</p>
+        </footer>
+    </div>
+
+    <!-- =========================================================
+         ADMIN MODAL
+         ========================================================= -->
+    <div id="adminModal">
+        <div class="glass rounded-2xl max-w-lg w-full p-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-crown text-amber-400"></i>
+                    <h2 class="text-sm font-bold text-amber-300">ADMIN PANEL</h2>
+                </div>
+                <button onclick="closeAdminPanel()" class="text-slate-500 hover:text-white transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
+                        <i class="fa-solid fa-bullhorn text-amber-400 text-[10px]"></i> Broadcast Messages
+                    </label>
+                    <p class="text-[9px] text-slate-500">Separate with <code class="text-indigo-300">|</code></p>
+                    <textarea id="adminTickerInput" rows="4" class="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-[11px] mono text-slate-200 focus:border-amber-500/60 transition resize-none"></textarea>
+                    <button onclick="adminUpdateTicker()" class="bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-check text-[9px]"></i> Update Broadcast
+                    </button>
+                </div>
+
+                <div class="border-t border-white/[0.06] pt-4 space-y-2">
+                    <label class="text-[10px] font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
+                        <i class="fa-solid fa-key text-indigo-400 text-[10px]"></i> Generate Test Key
+                    </label>
+                    <div class="flex gap-2">
+                        <input id="adminTestKeyOutput" readonly placeholder="CHK-XXXXX-XXXXX" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-2.5 py-1.5 text-[11px] mono text-slate-200">
+                        <button onclick="adminGenerateTestKey()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus text-[9px]"></i> Generate
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border-t border-white/[0.06] pt-4">
+                    <p class="text-[9px] text-slate-500">Logged in as <strong class="text-amber-300">@ADMIN_ROOT</strong> — Master Override</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+let isRunning = false;
+let abortController = null;
+let currentAccessKey = localStorage.getItem('checker_key') || '';
+let connectedUser = null;
+let isAdmin = false;
+let maskingOn = true;
+let selectedGateway = 'stripe_1';
+let activeTab = 'approved';
+
+let totalQueued = 0;
+let checkedCount = 0;
+let approvedCount = 0;
+let insuCount = 0;
+let threeDsCount = 0;
+let declineCount = 0;
+
+/* ============================================================
+   TAB CONFIG
+============================================================ */
+const TAB_CONFIG = {
+    approved: { title: 'APPROVED', color: 'text-emerald-400', dot: 'bg-emerald-500', border: 'border-emerald-500/40', titleCls: 'text-emerald-400', badgeCls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/25' },
+    insu:     { title: 'INSU',     color: 'text-amber-400',   dot: 'bg-amber-500',   border: 'border-amber-500/40',   titleCls: 'text-amber-400',   badgeCls: 'bg-amber-500/15 text-amber-300 border-amber-500/25' },
+    '3ds':    { title: '3DS',      color: 'text-cyan-400',    dot: 'bg-cyan-500',    border: 'border-cyan-500/40',    titleCls: 'text-cyan-400',    badgeCls: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/25' },
+    declined: { title: 'DECLINED', color: 'text-rose-400',    dot: 'bg-rose-500',    border: 'border-rose-500/40',    titleCls: 'text-rose-400',    badgeCls: 'bg-rose-500/15 text-rose-300 border-rose-500/25' }
+};
+
+/* ============================================================
+   TOAST
+============================================================ */
+const TOAST_ICONS = { success: 'fa-circle-check', error: 'fa-circle-xmark', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+const TOAST_STYLES = {
+    success: 'border-emerald-500/30 bg-emerald-950/85 text-emerald-200',
+    error:   'border-rose-500/30 bg-rose-950/85 text-rose-200',
+    warning: 'border-amber-500/30 bg-amber-950/85 text-amber-200',
+    info:    'border-indigo-500/30 bg-indigo-950/85 text-indigo-200'
+};
+function showToast(message, type = 'info', duration = 3800) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast-item glass rounded-xl px-3 py-2.5 flex items-start gap-2.5 border ${TOAST_STYLES[type] || TOAST_STYLES.info} pointer-events-auto`;
+    toast.innerHTML = `
+        <i class="fa-solid ${TOAST_ICONS[type] || TOAST_ICONS.info} text-sm mt-0.5"></i>
+        <p class="text-[11px] font-medium leading-relaxed flex-1">${message}</p>
+        <button onclick="this.parentElement.remove()" class="text-slate-500 hover:text-white transition ml-1 flex-shrink-0">
+            <i class="fa-solid fa-xmark text-[9px]"></i>
+        </button>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.transition = 'opacity .3s ease, transform .3s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-8px) scale(0.96)';
+        setTimeout(() => toast.remove(), 320);
+    }, duration);
+}
+
+/* ============================================================
+   HELPERS
+============================================================ */
+function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function getInputLines() {
+    return document.getElementById('bulkInput').value.split('\n').map(l => l.trim()).filter(l => l !== '');
+}
+function nowTs() { return new Date().toLocaleTimeString('en-US', { hour12: false }); }
+
+/* ============================================================
+   MASKING
+============================================================ */
+function maskData(raw) {
+    if (!raw) return '';
+    const str = String(raw);
+    if (str.includes('|')) {
+        const parts = str.split('|');
+        if (parts.length >= 1) {
+            const primary = parts[0].trim();
+            if (primary.length > 10) {
+                parts[0] = primary.slice(0, 6) + '*'.repeat(Math.max(5, primary.length - 10)) + primary.slice(-4);
+            } else if (primary.length > 4) {
+                parts[0] = primary.slice(0, 2) + '*'.repeat(Math.max(4, primary.length - 4)) + primary.slice(-2);
+            }
+        }
+        if (parts.length >= 4) {
+            const cvv = parts[parts.length - 1].trim();
+            if (/^\d{3,4}$/.test(cvv)) parts[parts.length - 1] = '0'.repeat(cvv.length);
+        }
+        return parts.join('|');
+    }
+    if (str.length > 8) {
+        const keep = Math.floor(str.length * 0.3);
+        const maskLen = str.length - keep * 2;
+        return str.slice(0, keep) + '*'.repeat(Math.max(3, maskLen)) + str.slice(-keep);
+    }
+    return str;
+}
+
+function toggleMasking() {
+    maskingOn = !maskingOn;
+    const btn = document.getElementById('maskToggle');
+    const icon = document.getElementById('maskIcon');
+    const label = document.getElementById('maskLabel');
+    if (maskingOn) {
+        btn.classList.remove('off'); btn.classList.add('on');
+        icon.className = 'fa-solid fa-eye text-[9px]';
+        label.innerText = 'MASK ON';
+        applyMask();
+    } else {
+        btn.classList.remove('on'); btn.classList.add('off');
+        icon.className = 'fa-solid fa-eye-slash text-[9px]';
+        label.innerText = 'MASK OFF';
+        applyUnmask();
+    }
+}
+
+function applyMask() {
+    ['approved', 'insu', '3ds', 'declined'].forEach(k => {
+        const pane = document.getElementById('terminal' + k.charAt(0).toUpperCase() + k.slice(1));
+        pane.querySelectorAll('.result-row').forEach(row => {
+            const cell = row.querySelector('.data-cell');
+            if (cell && cell.dataset.raw !== undefined) cell.textContent = maskData(cell.dataset.raw);
+        });
+    });
+}
+function applyUnmask() {
+    ['approved', 'insu', '3ds', 'declined'].forEach(k => {
+        const pane = document.getElementById('terminal' + k.charAt(0).toUpperCase() + k.slice(1));
+        pane.querySelectorAll('.result-row').forEach(row => {
+            const cell = row.querySelector('.data-cell');
+            if (cell && cell.dataset.raw !== undefined) cell.textContent = cell.dataset.raw;
+        });
+    });
+}
+
+/* ============================================================
+   LOGIN PORTAL
+============================================================ */
+function onKeyInputChange() {
+    const val = document.getElementById('gateAccessKeyInput').value.trim();
+    const badge = document.getElementById('keyStatusBadge');
+    if (val.length > 0) {
+        badge.innerText = 'KEY DETECTED';
+        badge.classList.add('detected');
+    } else {
+        badge.innerText = 'AWAITING KEY';
+        badge.classList.remove('detected');
+    }
+}
+
+async function pasteKey() {
+    try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+            document.getElementById('gateAccessKeyInput').value = text.trim();
+            onKeyInputChange();
+            showToast('Key pasted from clipboard.', 'success', 2000);
+        }
+    } catch (e) {
+        showToast('Clipboard access denied. Paste manually.', 'warning', 2500);
+    }
+}
+
+async function loginFromGate() {
+    const key = document.getElementById('gateAccessKeyInput').value.trim();
+    if (!key) { showToast('Please enter an Access Key.', 'warning'); return; }
+
+    const btn = document.getElementById('gateConnectBtn');
+    const label = document.getElementById('gateBtnLabel');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    label.innerText = 'AUTHENTICATING...';
+    btn.querySelector('i').className = 'spinner';
+
+    // ===== ADMIN OVERRIDE =====
+    if (key === 'admin979') {
+        connectedUser = { username: 'ADMIN_ROOT', role: 'admin', credits: '∞' };
+        isAdmin = true;
+        currentAccessKey = key;
+        localStorage.setItem('checker_key', key);
+        document.getElementById('userNameDisplay').innerText = '@ADMIN';
+        document.getElementById('creditDisplay').innerText = '∞';
+        document.getElementById('adminPanelBtn').style.display = 'flex';
+        document.getElementById('tickerEditBtn').style.display = 'inline-flex';
+        // Admin unlock visual
+        const card = document.querySelector('.vault-card');
+        if (card) {
+            card.classList.add('admin-unlock-pulse');
+            setTimeout(() => card.classList.remove('admin-unlock-pulse'), 950);
+        }
+        showToast('👑 Admin Master Override authenticated. Unlimited credits.', 'success', 4500);
+        setTimeout(() => enterWorkspace(), 550);
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+        return;
+    }
+
+    // ===== STANDARD USER =====
+    try {
+        const res = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ access_key: key })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || 'Invalid Access Key. Please verify.');
+        }
+        const user = await res.json();
+        connectedUser = { ...user, role: 'user' };
+        isAdmin = false;
+        currentAccessKey = key;
+        localStorage.setItem('checker_key', key);
+        document.getElementById('userNameDisplay').innerText = '@' + user.username;
+        document.getElementById('creditDisplay').innerText = user.credits;
+        document.getElementById('adminPanelBtn').style.display = 'none';
+        document.getElementById('tickerEditBtn').style.display = 'none';
+        showToast(`Connected as @${user.username}. Credits: ${user.credits}`, 'success');
+        setTimeout(() => enterWorkspace(), 350);
+    } catch (err) {
+        showToast(err.message || 'Authentication failed.', 'error');
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+    }
+}
+
+function enterWorkspace() {
+    const gate = document.getElementById('loginGate');
+    const ws = document.getElementById('mainWorkspace');
+    gate.classList.add('hidden-gate');
+    setTimeout(() => { gate.style.display = 'none'; }, 500);
+    ws.style.display = 'block';
+    requestAnimationFrame(() => {
+        ws.style.transition = 'opacity .5s ease, transform .5s ease';
+        ws.style.opacity = '1';
+        ws.style.transform = 'scale(1)';
+    });
+    ws.style.transform = 'scale(0.98)';
+}
+
+function logout() {
+    if (isRunning) { showToast('Please stop the engine before logging out.', 'warning'); return; }
+    localStorage.removeItem('checker_key');
+    currentAccessKey = ''; connectedUser = null; isAdmin = false;
+    const gate = document.getElementById('loginGate');
+    const ws = document.getElementById('mainWorkspace');
+    ws.style.transition = 'opacity .3s ease';
+    ws.style.opacity = '0';
+    setTimeout(() => {
+        ws.style.display = 'none';
+        ws.style.opacity = '1';
+        gate.style.display = 'flex';
+        gate.classList.remove('hidden-gate');
+        document.getElementById('gateAccessKeyInput').value = '';
+        document.getElementById('keyStatusBadge').innerText = 'AWAITING KEY';
+        document.getElementById('keyStatusBadge').classList.remove('detected');
+    }, 300);
+    showToast('Session ended.', 'info');
+}
+
+/* ============================================================
+   REDEEM
+============================================================ */
+function toggleRedeemDrawer() {
+    document.getElementById('redeemDrawer').classList.toggle('hidden');
+}
+async function redeemCode() {
+    const code = document.getElementById('redeemInput').value.trim();
+    if (!code) { showToast('Please enter a voucher code.', 'warning'); return; }
+    if (isAdmin) {
+        showToast('Admin mode — credits are unlimited.', 'info');
+        document.getElementById('redeemInput').value = '';
+        return;
+    }
+    try {
+        const res = await fetch('/api/redeem', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ access_key: currentAccessKey, key_code: code })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Redeem failed.');
+        document.getElementById('creditDisplay').innerText = data.credits;
+        if (connectedUser) connectedUser.credits = data.credits;
+        document.getElementById('redeemInput').value = '';
+        document.getElementById('redeemDrawer').classList.add('hidden');
+        showToast(`+${data.added} credits applied. New balance: ${data.credits}`, 'success');
+    } catch (err) {
+        showToast(err.message || 'Redeem failed.', 'error');
+    }
+}
+
+/* ============================================================
+   GATEWAY
+============================================================ */
+function onGatewayChange() {
+    const sel = document.getElementById('gatewaySelect');
+    selectedGateway = sel.value;
+    const tag = sel.options[sel.selectedIndex].dataset.tag || 'STRIPE $1';
+    document.getElementById('gatewayTag').innerHTML = `<i class="fa-solid fa-bolt text-[7px]"></i> ${tag}`;
+}
+
+/* ============================================================
+   TICKER
+============================================================ */
+const DEFAULT_ANNOUNCEMENTS = [
+    '🔥 Gateway Stripe Auth v2 running at 99.8% uptime',
+    '⚡ High-speed proxy nodes updated across all regions',
+    '💎 Redeem VIP vouchers for bonus credits',
+    '📞 Contact @Admin for bulk plans',
+    '🛡️ All checks encrypted via TLS 1.3'
+];
+let tickerMessages = [...DEFAULT_ANNOUNCEMENTS];
+
+function renderTicker(messages) {
+    const track = document.getElementById('tickerTrack');
+    if (!messages || messages.length === 0) { track.innerHTML = ''; return; }
+    const content = messages.map(m => `<span class="text-[9px] text-slate-300 font-medium mono">${escapeHtml(m)}</span>`).join('<span class="text-indigo-500/40 text-[9px] px-1">•</span>');
+    track.innerHTML = content + '<span class="text-indigo-500/40 text-[9px] px-1">•</span>' + content;
+}
+
+async function loadAnnouncement() {
+    try {
+        const res = await fetch('/api/announcement');
+        if (res.ok) {
+            const data = await res.json();
+            let msgs = [];
+            if (Array.isArray(data?.messages)) msgs = data.messages;
+            else if (typeof data?.message === 'string') msgs = [data.message];
+            else if (typeof data === 'string') msgs = [data];
+            if (msgs.length > 0) { tickerMessages = msgs; renderTicker(tickerMessages); return; }
+        }
+    } catch (e) {}
+    renderTicker(tickerMessages);
+}
+
+function editTickerText() {
+    if (!isAdmin) return;
+    const current = tickerMessages.join(' | ');
+    const input = prompt('Edit broadcast messages (separate with |):', current);
+    if (input === null) return;
+    const msgs = input.split('|').map(s => s.trim()).filter(s => s !== '');
+    tickerMessages = msgs.length > 0 ? msgs : [...DEFAULT_ANNOUNCEMENTS];
+    renderTicker(tickerMessages);
+    showToast('Broadcast updated.', 'success');
+}
+
+/* ============================================================
+   LATENCY
+============================================================ */
+let latencyInterval = null;
+function startLatencyMonitor() {
+    if (latencyInterval) clearInterval(latencyInterval);
+    // Latency is not displayed in v6 header, but keep interval if needed later
+}
+
+/* ============================================================
+   INPUT UTILITIES
+============================================================ */
+function onInputChange() {
+    const lines = getInputLines();
+    document.getElementById('lineCountBadge').innerText = `${lines.length} LINES`;
+    document.getElementById('statQueued').innerText = lines.length;
+}
+function removeDuplicates() {
+    const ta = document.getElementById('bulkInput');
+    const lines = getInputLines();
+    const unique = [...new Set(lines)];
+    ta.value = unique.join('\n');
+    onInputChange();
+    showToast(`Removed ${lines.length - unique.length} duplicate(s).`, 'info');
+}
+function cleanEmptyLines() {
+    const ta = document.getElementById('bulkInput');
+    ta.value = getInputLines().join('\n');
+    onInputChange();
+    showToast('Empty lines stripped.', 'info');
+}
+function clearInput() {
+    if (isRunning) { showToast('Stop the engine first.', 'warning'); return; }
+    document.getElementById('bulkInput').value = '';
+    onInputChange();
+    showToast('Input cleared.', 'info');
+}
+function importTxtFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const ta = document.getElementById('bulkInput');
+        const existing = ta.value.trim();
+        const content = String(e.target.result).trim();
+        ta.value = existing ? `${existing}\n${content}` : content;
+        onInputChange();
+        showToast(`Imported ${file.name}.`, 'success');
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+/* ============================================================
+   TELEMETRY
+============================================================ */
+function updateTelemetry(remainingQueued) {
+    document.getElementById('statQueued').innerText = remainingQueued;
+    document.getElementById('statApproved').innerText = approvedCount;
+    document.getElementById('statInsu').innerText = insuCount;
+    document.getElementById('stat3DS').innerText = threeDsCount;
+    document.getElementById('statDeclined').innerText = declineCount;
+
+    document.getElementById('tabCountApproved').innerText = approvedCount;
+    document.getElementById('tabCountInsu').innerText = insuCount;
+    document.getElementById('tabCount3ds').innerText = threeDsCount;
+    document.getElementById('tabCountDeclined').innerText = declineCount;
+
+    const total = totalQueued > 0 ? totalQueued : 1;
+    document.getElementById('segApproved').style.width = (approvedCount / total * 100) + '%';
+    document.getElementById('segInsu').style.width = (insuCount / total * 100) + '%';
+    document.getElementById('seg3ds').style.width = (threeDsCount / total * 100) + '%';
+    document.getElementById('segDeclined').style.width = (declineCount / total * 100) + '%';
+
+    const checked = checkedCount;
+    const ttl = totalQueued;
+    const pct = ttl > 0 ? Math.round((checked / ttl) * 100) : 0;
+
+    const badge = document.getElementById('engineStatusBadge');
+    const dot = document.getElementById('engineStatusDot');
+    const txt = document.getElementById('engineStatusText');
+    if (isRunning) {
+        badge.className = 'inline-flex items-center gap-1 text-[9px] font-bold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2 py-1 rounded-full mono tracking-wider';
+        dot.className = 'h-1.5 w-1.5 rounded-full bg-indigo-400 pulse-dot';
+        txt.innerText = `PROCESSING ${pct}%`;
+    } else if (checked > 0 && checked >= ttl && ttl > 0) {
+        badge.className = 'inline-flex items-center gap-1 text-[9px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded-full mono tracking-wider';
+        dot.className = 'h-1.5 w-1.5 rounded-full bg-emerald-400';
+        txt.innerText = 'COMPLETED';
+    } else {
+        badge.className = 'inline-flex items-center gap-1 text-[9px] font-bold bg-slate-800/80 text-slate-400 border border-white/10 px-2 py-1 rounded-full mono tracking-wider';
+        dot.className = 'h-1.5 w-1.5 rounded-full bg-slate-500';
+        txt.innerText = 'SYSTEM READY';
+    }
+
+    // Update active tab header count
+    document.getElementById('activeTabCount').innerText =
+        activeTab === 'approved' ? approvedCount :
+        activeTab === 'insu' ? insuCount :
+        activeTab === '3ds' ? threeDsCount : declineCount;
+}
+
+/* ============================================================
+   TABBED VAULT
+============================================================ */
+function switchTab(tab) {
+    activeTab = tab;
+    // Tab buttons
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+    const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if (btn) btn.classList.add('active-tab');
+    // Panes
+    document.querySelectorAll('.terminal-pane').forEach(p => p.classList.add('hidden'));
+    const paneId = 'terminal' + tab.charAt(0).toUpperCase() + tab.slice(1).replace('3ds', '3ds');
+    const pane = document.getElementById(paneId);
+    if (pane) pane.classList.remove('hidden');
+
+    // Action bar
+    const cfg = TAB_CONFIG[tab];
+    document.getElementById('activeTabTitle').innerText = cfg.title;
+    document.getElementById('activeTabTitle').className = `text-[10px] font-bold tracking-wider uppercase truncate ${cfg.titleCls}`;
+    document.getElementById('activeTabDot').className = `h-1.5 w-1.5 rounded-full pulse-dot ${cfg.dot}`;
+    document.getElementById('activeTabCount').className = `text-[8px] font-bold border px-1.5 py-0.5 rounded mono ${cfg.badgeCls}`;
+    document.getElementById('activeTabCount').innerText =
+        tab === 'approved' ? approvedCount :
+        tab === 'insu' ? insuCount :
+        tab === '3ds' ? threeDsCount : declineCount;
+}
+
+function getPaneId(vaultKey) {
+    return 'terminal' + vaultKey.charAt(0).toUpperCase() + vaultKey.slice(1);
+}
+
+function appendToVault(vaultKey, item) {
+    const pane = document.getElementById(getPaneId(vaultKey));
+    if (!pane) return;
+    const empty = pane.querySelector('.empty-state');
+    if (empty) empty.remove();
+
+    const rawData = item.data || '';
+    const rawResponse = item.response || '';
+    const displayData = maskingOn ? maskData(rawData) : rawData;
+
+    const cfg = TAB_CONFIG[vaultKey];
+    const borderCls = cfg.border;
+
+    const row = document.createElement('div');
+    row.className = `result-row terminal-line bg-white/[0.02] border-l-2 ${borderCls} rounded-r-lg px-2.5 py-1.5 flex items-center justify-between gap-2`;
+    row.dataset.rawData = rawData;
+    row.dataset.rawResponse = rawResponse;
+
+    row.innerHTML = `
+        <div class="flex items-center gap-1.5 min-w-0 flex-1">
+            <span class="text-[7px] font-bold px-1 py-0.5 rounded border ${cfg.badgeCls} flex-shrink-0 mono tracking-wider">${cfg.title}</span>
+            <span class="data-cell text-slate-300 break-all mono text-[10px] truncate" data-raw="${escapeHtml(rawData)}">${escapeHtml(displayData)}</span>
+            <button onclick="copySingleRow(this)" data-tooltip="Copy row" class="text-slate-600 hover:text-indigo-400 transition flex-shrink-0">
+                <i class="fa-regular fa-copy text-[8px]"></i>
+            </button>
+        </div>
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+            <span class="${cfg.titleCls} mono text-[9px] whitespace-nowrap">${escapeHtml(rawResponse)}</span>
+            <span class="text-[7px] text-slate-600 mono">${nowTs()}</span>
+        </div>
+    `;
+    pane.prepend(row);
+
+    // Arrival pulse
+    const header = document.getElementById('engineStatusBadge');
+    if (header) {
+        header.classList.add('vault-arrival-pulse');
+        setTimeout(() => header.classList.remove('vault-arrival-pulse'), 950);
+    }
+}
+
+function copySingleRow(btn) {
+    const row = btn.closest('.result-row');
+    if (!row) return;
+    const raw = row.dataset.rawData + ' → ' + row.dataset.rawResponse;
+    navigator.clipboard.writeText(raw)
+        .then(() => showToast('Row copied.', 'success', 1800))
+        .catch(() => showToast('Clipboard write failed.', 'error'));
+}
+
+function getVaultLines(vaultKey) {
+    const pane = document.getElementById(getPaneId(vaultKey));
+    return Array.from(pane.querySelectorAll('.result-row')).map(r => {
+        return `${nowTs()} [${TAB_CONFIG[vaultKey].title}] ${r.dataset.rawData} → ${r.dataset.rawResponse}`;
+    });
+}
+
+function copyActiveVault() {
+    const lines = getVaultLines(activeTab);
+    if (lines.length === 0) { showToast('Nothing to copy.', 'warning'); return; }
+    navigator.clipboard.writeText(lines.join('\n'))
+        .then(() => showToast(`${TAB_CONFIG[activeTab].title} copied (raw, ${lines.length}).`, 'success'))
+        .catch(() => showToast('Clipboard write failed.', 'error'));
+}
+
+function exportActiveVault() {
+    const lines = getVaultLines(activeTab);
+    if (lines.length === 0) { showToast('Nothing to export.', 'warning'); return; }
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nexus_${activeTab}_${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`${TAB_CONFIG[activeTab].title} exported (raw).`, 'success');
+}
+
+function clearActiveVault() {
+    const pane = document.getElementById(getPaneId(activeTab));
+    pane.innerHTML = '';
+    const cfg = TAB_CONFIG[activeTab];
+    const emptyIcons = { approved: 'fa-folder-open', insu: 'fa-coins', '3ds': 'fa-lock', declined: 'fa-circle-xmark' };
+    pane.innerHTML = `
+        <div class="empty-state flex flex-col items-center justify-center py-12 text-slate-700 gap-2">
+            <i class="fa-regular ${emptyIcons[activeTab]} text-2xl opacity-60"></i>
+            <span class="text-[9px] font-medium tracking-wide">No ${cfg.title.toLowerCase()} results yet</span>
+        </div>
+    `;
+    if (activeTab === 'approved') approvedCount = 0;
+    else if (activeTab === 'insu') insuCount = 0;
+    else if (activeTab === '3ds') threeDsCount = 0;
+    else declineCount = 0;
+    updateTelemetry(getInputLines().length);
+    showToast(`${cfg.title} cleared.`, 'info');
+}
+
+/* ============================================================
+   ADMIN MODAL
+============================================================ */
+function openAdminPanel() {
+    if (!isAdmin) { showToast('Admin access required.', 'warning'); return; }
+    document.getElementById('adminTickerInput').value = tickerMessages.join(' | ');
+    document.getElementById('adminModal').classList.add('open');
+}
+function closeAdminPanel() {
+    document.getElementById('adminModal').classList.remove('open');
+}
+function adminUpdateTicker() {
+    const input = document.getElementById('adminTickerInput').value.trim();
+    const msgs = input.split('|').map(s => s.trim()).filter(s => s !== '');
+    if (msgs.length === 0) { showToast('Enter at least one message.', 'warning'); return; }
+    tickerMessages = msgs;
+    renderTicker(tickerMessages);
+    closeAdminPanel();
+    showToast('Broadcast updated.', 'success');
+}
+function adminGenerateTestKey() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let key = 'CHK-';
+    for (let i = 0; i < 5; i++) key += chars[Math.floor(Math.random() * chars.length)];
+    key += '-';
+    for (let i = 0; i < 5; i++) key += chars[Math.floor(Math.random() * chars.length)];
+    document.getElementById('adminTestKeyOutput').value = key;
+    showToast('Test key generated.', 'success');
+}
+
+/* ============================================================
+   ENGINE
+============================================================ */
+async function startEngine() {
+    if (!currentAccessKey || !connectedUser) { showToast('Please connect first.', 'warning'); return; }
+
+    const textarea = document.getElementById('bulkInput');
+    let lines = getInputLines();
+    if (lines.length === 0) { showToast('Please enter data to check.', 'warning'); return; }
+
+    totalQueued = lines.length;
+    checkedCount = 0;
+    approvedCount = 0;
+    insuCount = 0;
+    threeDsCount = 0;
+    declineCount = 0;
+    updateTelemetry(lines.length);
+
+    // Reset all panes
+    ['approved', 'insu', '3ds', 'declined'].forEach(k => {
+        const pane = document.getElementById(getPaneId(k));
+        const icons = { approved: 'fa-folder-open', insu: 'fa-coins', '3ds': 'fa-lock', declined: 'fa-circle-xmark' };
+        pane.innerHTML = `
+            <div class="empty-state flex flex-col items-center justify-center py-12 text-slate-700 gap-2">
+                <i class="fa-regular ${icons[k]} text-2xl opacity-60"></i>
+                <span class="text-[9px] font-medium tracking-wide">No ${TAB_CONFIG[k].title.toLowerCase()} results yet</span>
+            </div>
+        `;
+    });
+
+    isRunning = true;
+    abortController = new AbortController();
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    startBtn.disabled = true;
+    startBtn.innerHTML = '<span class="spinner"></span> RUNNING...';
+    stopBtn.disabled = false;
+
+    showToast(`Engine started. Processing ${lines.length} entries.`, 'info');
+
+    try {
+        while (lines.length > 0 && isRunning) {
+            const currentLine = lines[0];
+
+            const res = await fetch('/api/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    access_key: currentAccessKey,
+                    data: currentLine,
+                    gateway: selectedGateway
+                }),
+                signal: abortController.signal
+            });
+
+            if (res.status === 402) {
+                showToast('Out of credits! Please redeem a voucher to continue.', 'error', 6500);
+                break;
+            }
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Server error during check.');
+            }
+
+            const payload = await res.json();
+            const item = payload.result || {};
+
+            if (typeof payload.credits === 'number' && !isAdmin) {
+                document.getElementById('creditDisplay').innerText = payload.credits;
+                if (connectedUser) connectedUser.credits = payload.credits;
+            }
+
+            // Route
+            const vaultKey = routeStatus(item);
+            if (vaultKey === 'approved') approvedCount++;
+            else if (vaultKey === 'insu') insuCount++;
+            else if (vaultKey === '3ds') threeDsCount++;
+            else declineCount++;
+
+            checkedCount++;
+            appendToVault(vaultKey, item);
+
+            lines.shift();
+            textarea.value = lines.join('\n');
+            document.getElementById('lineCountBadge').innerText = `${lines.length} LINES`;
+
+            updateTelemetry(lines.length);
+        }
+    } catch (err) {
+        if (err.name === 'AbortError') showToast('Engine stopped by user.', 'info');
+        else showToast(err.message || 'An error occurred.', 'error');
+    } finally {
+        isRunning = false;
+        abortController = null;
+        startBtn.disabled = false;
+        startBtn.innerHTML = '<i class="fa-solid fa-play text-[9px]"></i> START ENGINE';
+        stopBtn.disabled = true;
+        updateTelemetry(getInputLines().length);
+        if (checkedCount > 0 && lines.length === 0) {
+            showToast(`Engine completed. ${checkedCount} entries processed.`, 'success');
+        }
+    }
+}
+
+function stopEngine() {
+    if (isRunning && abortController) {
+        isRunning = false;
+        abortController.abort();
+        showToast('Stopping engine...', 'warning');
+    }
+}
+
+function routeStatus(item) {
+    const status = String(item.status || '').toLowerCase().trim();
+    const response = String(item.response || '').toLowerCase();
+    if (status === 'approved' || status === 'live') return 'approved';
+    if (status === 'insu' || status === 'insufficient') return 'insu';
+    if (status === '3ds' || status === 'otp') return '3ds';
+    if (['declined', 'decline', 'die', 'error', 'failed', 'fail'].includes(status)) return 'declined';
+    if (response.includes('insufficient') || response.includes('not enough')) return 'insu';
+    if (response.includes('3ds') || response.includes('otp') || response.includes('verify') || response.includes('authentication')) return '3ds';
+    if (response.includes('approved') || response.includes('live') || response.includes('success')) return 'approved';
+    if (response.includes('declined') || response.includes('die') || response.includes('failed') || response.includes('error')) return 'declined';
+    return 'declined';
+}
+
+/* ============================================================
+   PARTICLE / BACKGROUND ANIMATION
+============================================================ */
+function spawnParticles() {
+    const field = document.getElementById('particleField');
+    if (!field) return;
+    for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.bottom = '-10px';
+        p.style.animationDelay = (Math.random() * 12) + 's';
+        p.style.animationDuration = (10 + Math.random() * 10) + 's';
+        field.appendChild(p);
+    }
+}
+
+function spawnLoginParticles() {
+    const field = document.getElementById('loginParticleField');
+    if (!field) return;
+    for (let i = 0; i < 15; i++) {
+        const p = document.createElement('div');
+        p.className = 'login-particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.bottom = '-10px';
+        p.style.animationDelay = (Math.random() * 10) + 's';
+        p.style.animationDuration = (8 + Math.random() * 8) + 's';
+        field.appendChild(p);
+    }
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+(function init() {
+    spawnParticles();
+    spawnLoginParticles();
+    onGatewayChange();
+    renderTicker(tickerMessages);
+    onInputChange();
+    switchTab('approved');
+
+    const savedKey = localStorage.getItem('checker_key');
+    if (savedKey === 'admin979') {
+        connectedUser = { username: 'ADMIN_ROOT', role: 'admin', credits: '∞' };
+        isAdmin = true;
+        currentAccessKey = 'admin979';
+        document.getElementById('userNameDisplay').innerText = '@ADMIN';
+        document.getElementById('creditDisplay').innerText = '∞';
+        document.getElementById('adminPanelBtn').style.display = 'flex';
+        document.getElementById('tickerEditBtn').style.display = 'inline-flex';
+        enterWorkspace();
+        showToast('👑 Admin session restored.', 'success');
+        loadAnnouncement();
+    } else if (savedKey) {
+        fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ access_key: savedKey })
+        }).then(async (res) => {
+            if (!res.ok) throw new Error('Session expired');
+            const user = await res.json();
+            connectedUser = { ...user, role: 'user' };
+            isAdmin = false;
+            currentAccessKey = savedKey;
+            document.getElementById('userNameDisplay').innerText = '@' + user.username;
+            document.getElementById('creditDisplay').innerText = user.credits;
+            enterWorkspace();
+            showToast(`Session restored as @${user.username}.`, 'success');
+            loadAnnouncement();
+        }).catch(() => {
+            localStorage.removeItem('checker_key');
+            showToast('Saved session expired. Please log in again.', 'warning');
+            loadAnnouncement();
+        });
+    } else {
+        loadAnnouncement();
+    }
+})();
+</script>
+</body>
+</html>
