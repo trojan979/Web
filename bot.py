@@ -19,8 +19,8 @@ from telegram.ext import (
 # ============================================================
 # CONFIG
 # ============================================================
-BOT_TOKEN = "8682439584:AAEZNqlGag6WzOsvB4odTkjc3TjNHqAgWN4"
-ADMIN_ID = 7954343626  # Your Telegram admin user id
+BOT_TOKEN = "9188715770:AAEcc5ErS6TDDM9617-pYXQR_Yl0LjOI_dQ"
+ADMIN_ID = 8961568686  # Your Telegram admin user id
 
 DB_PATH = "checker_data.db"
 
